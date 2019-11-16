@@ -34,6 +34,8 @@ get.season <- function (dates) {
 avg.week.evening <- aggregate(wed.evenings$Global_active_power, by=list(week(as.Date(wed.evenings$Date, format='%d/%m/%Y'))), mean)
 names(avg.week.evening) <- c('Week','Global_active_power')
 
+# plot(avg.week.evening$Global_active_power, type='l')
+
 # store min and max
 max.week <- max(avg.week.evening$Global_active_power)
 min.week <- min(avg.week.evening$Global_active_power)
