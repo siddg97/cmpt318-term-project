@@ -1,6 +1,6 @@
 library(lubridate);
 
-t1 <- read.csv("U:/cmpt318/TestData/test1.txt")
+t1 <- read.csv("~/git/cmpt318-term-project/test1.txt")
 
 wed.evenings <- t1[(as.POSIXlt(t1$Date, format='%d/%m/%Y')$wday==3) & 
 				   (hour(as.POSIXlt(t1$Time, format='%H:%M:%S'))>=18) & 
