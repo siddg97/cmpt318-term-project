@@ -66,12 +66,24 @@ plot.minute <- function(data,s,e) {
 
 #### function to get stuff for each week and plot
 explore.week <- function(data) {
+  ## FOR MIN, MAX AND MEAN
   mean.week <- aggregate(data$Global_active_power, by=list(week(as.Date(data$Date, format='%d/%m/%Y'))), mean)
   names(mean.week) <- c("Week", "Global_active_power")
-  layout(1)
+  
+  ## FOR S.D.
+  sd.week <- aggregate(data$Global_active_power, by=list(week(as.Date(data$Date, format='%d/%m/%Y'))), sd)
+  
+  ## PLOTS
+  layout(1:2)
   plot(
     mean.week, type='o', col='red', lwd=3, 
     main='Average for each week', xlab='Week', ylab='Global Active Power',
+    panel.first = grid(NULL,NULL,lwd=1,col='gray'), xaxt='n'
+  )
+  axis(side=1, at=1:53)
+  plot(
+    sd.week, type='l', col='green', lwd=3, 
+    main='Standard Deviation for each week', xlab='Week', ylab='Standard deviation',
     panel.first = grid(NULL,NULL,lwd=1,col='gray'), xaxt='n'
   )
   axis(side=1, at=1:53)
@@ -81,29 +93,54 @@ explore.week <- function(data) {
 
 #### function to get stuff for each month and plot
 explore.month <- function(data) {
+  ## FOR MIN, MAX AND MEAN
   mean.month <- aggregate(data$Global_active_power, by=list(month(as.Date(data$Date, format='%d/%m/%Y'))), mean)
   names(mean.month) <- c('Month','Global_active_power')
-  layout(1)
+  
+  ## FOR S.D.
+  sd.month <- aggregate(data$Global_active_power, by=list(month(as.Date(data$Date, format='%d/%m/%Y'))), sd)
+  
+  ## PLOTS
+  layout(1:2)
   plot(
     mean.month, type='o', col='blue', lwd=3,
     main='Average for each month', xlab='Month', ylab='Global Active Power',
     panel.first = grid(NULL,NULL,lwd=1,col='gray'), xaxt='n'
   )
   axis(side=1, at=1:12, labels=c('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sept','Oct','Nov','Dec'))
+  plot(
+    sd.month, type='l', col='green', lwd=3,
+    main='Standard Deviation for each month', xlab='Month', ylab='Standard deviation',
+    panel.first = grid(NULL,NULL,lwd=1,col='gray'), xaxt='n'
+  )
+  axis(side=1, at=1:12, labels=c('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sept','Oct','Nov','Dec'))
+
   return(c(max(mean.month$Global_active_power), min(mean.month$Global_active_power)))
 }
 
 
 #### function to get stuff for each season and plot
 explore.season <- function(data) {
+  ## FOR MIN, MAX AND MEAN
   mean.season <- aggregate(data$Global_active_power, by=list(season(data$Date)), mean)
   names(mean.season) <- c('Season','Global_active_power')
-  layout(1)
+  
+  ## FOR S.D.
+  sd.season <- aggregate(data$Global_active_power, by=list(season(data$Date)), sd)
+  names(sd.season) <- c('Season', 'Sd')
+  ## PLOTS
+  layout(1:2)
   plot(mean.season$Global_active_power, type='o', col='black', lwd=3, ylab='Global Active Power',
-       xlab='Season',main='Average for each season', xaxt='n',
+       xlab='',main='Average for each season', xaxt='n',
        panel.first = grid(NULL,NULL,lwd=1,col='gray') 
   )
   axis(side=1, at=1:4, labels=c('Fall','Spring','Summer','Winter'))
+  plot(sd.season$Sd, type='l', col='green', lwd=3, ylab='Standard deviation',
+       xlab='',main='Standard Deviation for each season', xaxt='n',
+       panel.first = grid(NULL,NULL,lwd=1,col='gray')
+  )
+  axis(side=1, at=1:4, labels=c('Fall','Spring','Summer','Winter'))
+  
   return(c(max(mean.season$Global_active_power), min(mean.season$Global_active_power)))
 }
 
