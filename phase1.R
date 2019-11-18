@@ -5,10 +5,14 @@ init <- function(day, start, end) {
   raw <- read.csv("~/git/cmpt318-term-project/TrainData.txt")
   
   ## FILTER FOR `NA`
-  td <- raw[!is.na(raw$Global_active_power) & !is.na(raw$Global_reactive_power) & !is.na(raw$Global_intensity) & !is.na(raw$Voltage),]
+  td <- raw[!is.na(raw$Global_active_power) & !is.na(raw$Global_reactive_power) 
+             & !is.na(raw$Global_intensity) & !is.na(raw$Voltage),]
   
   ## FILTER FOR "day" from "start" to "end" times
-  doi <- td[(as.POSIXlt(td$Date, format='%d/%m/%Y')$wday==day & hour(as.POSIXlt(td$Time, format='%H:%M:%S'))>=start & hour(as.POSIXlt(td$Time, format='%H:%M:%S'))<=end),]
+  doi <- td[(as.POSIXlt(td$Date, format='%d/%m/%Y')$wday==day 
+             & hour(as.POSIXlt(td$Time, format='%H:%M:%S'))>=start 
+             & hour(as.POSIXlt(td$Time, format='%H:%M:%S'))<=end),]
+  
   return(doi)
 }
 
@@ -18,7 +22,7 @@ season <- function(dates) {
   winterEnd <- 79 # March 20
   springEnd <- 171 # June 21
   summerEnd <- 266 # September 23
-  fallEnd <- 355 # December 21
+  fallEnd   <- 355 # December 21
   
   days <- yday(as.POSIXlt(dates, format="%d/%m/%Y"))
   
@@ -46,7 +50,7 @@ time.to.str <- function(time.num) {
 #### function to get average GAP plot for each minute
 plot.minute <- function(data,s,e) {
   avg.min <- c()
-  times <- c()
+  times   <- c()
   for (i in s:e) {
     t <- data[as.numeric(data$Time)==i,]
     avg.min <- c(avg.min, mean(t$Global_active_power))
@@ -163,11 +167,33 @@ c1 <- function(data){
   
 }
 
+##### Function to perform phase1 characteristic2 tasks
+c2 <- function(data) {
+  independent.features <- data[c(3,4,5,6)]
+  mat_c <- cor(independent.features)
+  ## extract cors
+  gap <- c(mat_c[1,2], mat_c[1,3], mat_c[1,4])
+  grp <- c(mat_c[2,1], mat_c[2,3], mat_c[2,4])
+  v   <- c(mat_c[3,1], mat_c[3,2], mat_c[3,4])
+  gi  <- c(mat_c[4,1], mat_c[4,2], mat_c[4,3])
+  
+  ## plot tcorrs for each feature
+  layout(matrix(c(1,2,3,4), nrow=2, byrow=TRUE))
+  plot(1:3, gap, lwd=2, type='l', col='red', xlab='', ylab='Correlation',xaxt='n', main='Global Active Power Correlation')
+  axis(side=1, at=1:3, labels= c('Global Reactive Power','Voltage','Global Intensity'))
+  plot(1:3, grp, lwd=2, type='l', col='blue', xlab='', ylab='Correlation', xaxt='n', main='Global Reactive Power Correlation')
+  axis(side=1, at=1:3, labels= c('Global Active Power','Voltage', 'Global Intensity'))
+  plot(1:3, v, lwd=2, type='l', col='red', xlab='', ylab='Correlation', xaxt='n', main='Voltage Correlation')
+  axis(side=1, at=1:3, labels= c('Global Active Power','Global Reactive Power', 'Global Intensity'))
+  plot(1:3, gi, lwd=2, type='l', col='black', xlab='', ylab='Correlation', xaxt='n', main='Global Intensity Correlation')
+  axis(side=1, at=1:3, labels= c('Global Active Power', 'Global Reactive Power', 'Voltage'))
+}
+
 ## Import data
 data <- init(3,16,18)               # init(day_number, start_time, end_time)
-
 ## perform c1 tasks
 c1(data)
-
+## perform c2 tasks
+c <- c2(data)
 
 
