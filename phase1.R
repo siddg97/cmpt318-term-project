@@ -2,7 +2,8 @@ library(lubridate);
 
 #### function to set up training data. filter for NAs and wednedsday time intervals
 init <- function(day, start, end) {
-  raw <- read.csv("~/git/cmpt318-term-project/TrainData.txt")
+  raw <- read.csv("C:/Users/sga94/Desktop/cmpt318-term-project-master/TrainData.txt")   
+  # read.csv("~/git/cmpt318-term-project/TrainData.txt")
   
   ## FILTER FOR `NA`
   td <- raw[!is.na(raw$Global_active_power) & !is.na(raw$Global_reactive_power) 
@@ -179,13 +180,28 @@ c2 <- function(data) {
   
   ## plot tcorrs for each feature
   layout(matrix(c(1,2,3,4), nrow=2, byrow=TRUE))
-  plot(1:3, gap, lwd=2, type='l', col='red', xlab='', ylab='Correlation',xaxt='n', main='Global Active Power Correlation')
+  plot(
+    1:3, gap, lwd=2, type='l', col='red', xlab='', ylab='Correlation', 
+    xaxt='n', main='Global Active Power Correlation', panel.first = grid(NULL,NULL,lwd=1,col='gray')
+  )
   axis(side=1, at=1:3, labels= c('Global Reactive Power','Voltage','Global Intensity'))
-  plot(1:3, grp, lwd=2, type='l', col='blue', xlab='', ylab='Correlation', xaxt='n', main='Global Reactive Power Correlation')
+  
+  plot(
+    1:3, grp, lwd=2, type='l', col='blue', xlab='', ylab='Correlation', 
+    xaxt='n', main='Global Reactive Power Correlation', panel.first = grid(NULL,NULL,lwd=1,col='gray')
+  )
   axis(side=1, at=1:3, labels= c('Global Active Power','Voltage', 'Global Intensity'))
-  plot(1:3, v, lwd=2, type='l', col='red', xlab='', ylab='Correlation', xaxt='n', main='Voltage Correlation')
+  
+  plot(
+    1:3, v, lwd=2, type='l', col='green', xlab='', ylab='Correlation', 
+    xaxt='n', main='Voltage Correlation', panel.first = grid(NULL,NULL,lwd=1,col='gray')
+  )
   axis(side=1, at=1:3, labels= c('Global Active Power','Global Reactive Power', 'Global Intensity'))
-  plot(1:3, gi, lwd=2, type='l', col='black', xlab='', ylab='Correlation', xaxt='n', main='Global Intensity Correlation')
+  
+  plot(
+    1:3, gi, lwd=2, type='l', col='black', xlab='', ylab='Correlation', 
+    xaxt='n', main='Global Intensity Correlation', panel.first = grid(NULL,NULL,lwd=1,col='gray')
+  )
   axis(side=1, at=1:3, labels= c('Global Active Power', 'Global Reactive Power', 'Voltage'))
 }
 
