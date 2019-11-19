@@ -61,11 +61,12 @@ plot.minute <- function(data,s,e) {
   }
   layout(1)
   plot(
-    s:e, avg.min, col='blue', type='o', xlab='Time [24 hour clock]', xaxt='n',
+    s:e, avg.min, col='darkred', type='o', xlab='Time [24 hour clock]', xaxt='n',
     ylab='Global Active Power', main='Average for each minute',
-    lwd=3, panel.first = grid(NULL,NULL,lwd=1,col='gray')
+    lwd=2, panel.first = grid(NULL,NULL,lwd=1,col='gray')
   )
   axis(side=1, at=seq(s,e,10), labels=times)
+  return(avg.min)
 }
 
 
@@ -81,13 +82,13 @@ explore.week <- function(data) {
   ## PLOTS
   layout(1:2)
   plot(
-    mean.week, type='o', col='red', lwd=3, 
+    mean.week, type='o', col='red3', lwd=3, 
     main='Average for each week', xlab='Week', ylab='Global Active Power',
     panel.first = grid(NULL,NULL,lwd=1,col='gray'), xaxt='n'
   )
   axis(side=1, at=1:53)
   plot(
-    sd.week, type='l', col='green', lwd=3, 
+    sd.week, type='o', col='chartreuse4', lwd=3, 
     main='Standard Deviation for each week', xlab='Week', ylab='Standard deviation',
     panel.first = grid(NULL,NULL,lwd=1,col='gray'), xaxt='n'
   )
@@ -108,13 +109,13 @@ explore.month <- function(data) {
   ## PLOTS
   layout(1:2)
   plot(
-    mean.month, type='o', col='blue', lwd=3,
+    mean.month, type='o', col='royalblue3', lwd=3,
     main='Average for each month', xlab='Month', ylab='Global Active Power',
     panel.first = grid(NULL,NULL,lwd=1,col='gray'), xaxt='n'
   )
   axis(side=1, at=1:12, labels=c('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sept','Oct','Nov','Dec'))
   plot(
-    sd.month, type='l', col='green', lwd=3,
+    sd.month, type='o', col='chartreuse4', lwd=3,
     main='Standard Deviation for each month', xlab='Month', ylab='Standard deviation',
     panel.first = grid(NULL,NULL,lwd=1,col='gray'), xaxt='n'
   )
@@ -135,12 +136,12 @@ explore.season <- function(data) {
   names(sd.season) <- c('Season', 'Sd')
   ## PLOTS
   layout(1:2)
-  plot(mean.season$Global_active_power, type='o', col='black', lwd=3, ylab='Global Active Power',
+  plot(mean.season$Global_active_power, type='o', col='slateblue4', lwd=3, ylab='Global Active Power',
        xlab='',main='Average for each season', xaxt='n',
        panel.first = grid(NULL,NULL,lwd=1,col='gray') 
   )
   axis(side=1, at=1:4, labels=c('Fall','Spring','Summer','Winter'))
-  plot(sd.season$Sd, type='l', col='green', lwd=3, ylab='Standard deviation',
+  plot(sd.season$Sd, type='o', col='chartreuse4', lwd=3, ylab='Standard deviation',
        xlab='',main='Standard Deviation for each season', xaxt='n',
        panel.first = grid(NULL,NULL,lwd=1,col='gray')
   )
@@ -155,7 +156,7 @@ explore.season <- function(data) {
 c1 <- function(data){
   
   ## plot minute avg
-  plot.minute(data,960,1080)          # plot.minute(data, start_minutes, end_minutes)
+  minute.data <- plot.minute(data,960,1080)          # plot.minute(data, start_minutes, end_minutes)
   
   ## plot and find week data
   week.data   <- explore.week(data)   # week.data   = list(max,min)
@@ -165,6 +166,10 @@ c1 <- function(data){
   
   ## plot and find season data
   season.data <- explore.season(data) # season.data = list(max,min)
+  x <- matrix(c(week.data, month.data, season.data), nrow=3, byrow=TRUE)
+  rownames(x) <- c('Week', 'Month', 'Season')
+  colnames(x) <- c('Max', 'Min')
+  return(x)
   
 }
 
@@ -181,35 +186,34 @@ c2 <- function(data) {
   ## plot tcorrs for each feature
   layout(matrix(c(1,2,3,4), nrow=2, byrow=TRUE))
   plot(
-    1:3, gap, lwd=2, type='l', col='red', xlab='', ylab='Correlation', 
+    1:3, gap, lwd=2, type='o', col='red3', xlab='', ylab='Correlation', 
     xaxt='n', main='Global Active Power Correlation', panel.first = grid(NULL,NULL,lwd=1,col='gray')
   )
   axis(side=1, at=1:3, labels= c('Global Reactive Power','Voltage','Global Intensity'))
   
   plot(
-    1:3, grp, lwd=2, type='l', col='blue', xlab='', ylab='Correlation', 
+    1:3, grp, lwd=2, type='o', col='dodgerblue2', xlab='', ylab='Correlation', 
     xaxt='n', main='Global Reactive Power Correlation', panel.first = grid(NULL,NULL,lwd=1,col='gray')
   )
   axis(side=1, at=1:3, labels= c('Global Active Power','Voltage', 'Global Intensity'))
   
   plot(
-    1:3, v, lwd=2, type='l', col='green', xlab='', ylab='Correlation', 
+    1:3, v, lwd=2, type='o', col='slateblue4', xlab='', ylab='Correlation', 
     xaxt='n', main='Voltage Correlation', panel.first = grid(NULL,NULL,lwd=1,col='gray')
   )
   axis(side=1, at=1:3, labels= c('Global Active Power','Global Reactive Power', 'Global Intensity'))
   
   plot(
-    1:3, gi, lwd=2, type='l', col='black', xlab='', ylab='Correlation', 
+    1:3, gi, lwd=2, type='o', col='chartreuse4', xlab='', ylab='Correlation', 
     xaxt='n', main='Global Intensity Correlation', panel.first = grid(NULL,NULL,lwd=1,col='gray')
   )
   axis(side=1, at=1:3, labels= c('Global Active Power', 'Global Reactive Power', 'Voltage'))
+  return(mat_c)
 }
 
 ## Import data
 data <- init(3,16,18)               # init(day_number, start_time, end_time)
 ## perform c1 tasks
-c1(data)
+c1.result <- c1(data)
 ## perform c2 tasks
-c <- c2(data)
-
-
+c2.result <- c2(data)
