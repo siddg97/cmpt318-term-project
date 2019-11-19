@@ -1,7 +1,12 @@
 library(lubridate)
+library(TTR)
 
 ds <- data
-test <- na.omit(read.csv('U:/cmpt318/test_data/test1.txt'));
+test <- na.omit(read.csv('~/git/cmpt318-term-project/TrainData.txt'));
+
+###########################################
+###########     CHARACTERISTIC 1 ##########
+###########################################
 
 # ## [TRAINING DATA] Weekly minimums for wednesday evenings for GAP, V and GI
 # week.mins <- aggregate(
@@ -52,3 +57,31 @@ for (i in 1:12) {
   abline(month.mins$GAP[i],0,col='blue',lwd=2)
 }
 
+
+###########################################
+###########     CHARACTERISTIC 2 ##########
+###########################################
+
+z <- 3
+# The z score threshold
+# A data value is an anomaly if its mean is not in [-z*SD, +z*SD]
+# Can be changed to modify sensitivity to point anomalies
+
+## get raw data
+move.GAP <- data.frame(Raw = test$Global_active_power)
+
+## run the moving average
+move.GAP$Mean <- runMean(move.GAP$Raw, n=20)
+
+## run the moving SD
+move.GAP$SD <- runSD(move.GAP$Raw, n=20)
+
+## find anomalies
+anomaly.GAP <- move.GAP$Raw[( (move.GAP$Raw < move.GAP$Mean - z*move.GAP$SD) | (move.GAP$Raw > move.GAP$Mean + z*move.GAP$SD) & !is.na(move.GAP$Mean) )]
+anomaly.GAP <- anomaly.GAP[!is.na(anomaly.GAP)]
+## accumulate indices
+anomaly.GAP.idx <- which(move.GAP$Raw < move.GAP$Mean - z*move.GAP$SD | move.GAP$Raw > move.GAP$Mean + z*move.GAP$SD )
+
+## Plot them mofos
+plot(move.GAP$Raw)
+points(anomaly.GAP.idx, anomaly.GAP,col='red', lwd=2)

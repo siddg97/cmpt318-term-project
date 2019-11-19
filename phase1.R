@@ -2,9 +2,8 @@ library(lubridate);
 
 #### function to set up training data. filter for NAs and wednedsday time intervals
 init <- function(day, start, end) {
-  raw <- read.csv("C:/Users/sga94/Desktop/cmpt318-term-project-master/TrainData.txt")   
-  # read.csv("~/git/cmpt318-term-project/TrainData.txt")
-  
+  raw <- read.csv("~/git/cmpt318-term-project/TrainData.txt")
+  # read.csv("C:/Users/sga94/Desktop/cmpt318-term-project-master/TrainData.txt")
   ## FILTER FOR `NA`
   td <- raw[!is.na(raw$Global_active_power) & !is.na(raw$Global_reactive_power) 
              & !is.na(raw$Global_intensity) & !is.na(raw$Voltage),]
