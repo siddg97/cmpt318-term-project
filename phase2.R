@@ -13,20 +13,6 @@ test <- na.omit(
 ###########   CHARACTERISTIC 1   ##########
 ###########################################
 
-# ## [TRAINING DATA] Weekly minimums for wednesday evenings for GAP, V and GI
-# week.mins <- aggregate(
-#                  list(GAP = ds$Global_active_power, V = ds$Voltage, GI = ds$Global_intensity), 
-#                  by= list(Week = week(as.Date(ds$Date, format='%d/%m/%Y'))), 
-#                  FUN = min
-#              )
-# 
-# ## [TRAINING DATA] Weekly maximums for wednesday evenings for GAP, V and GI
-# week.maxs <- aggregate(
-#                  list(GAP = ds$Global_active_power, V = ds$Voltage, GI = ds$Global_intensity), 
-#                  by= list(Week = week(as.Date(ds$Date, format='%d/%m/%Y'))), 
-#                  FUN = max
-#              )
-
 ## [TRAINING DATA] Monthly minimums for wednesday evenings for GAP, V and GI
 month.mins <- aggregate(
                   list(GAP = ds$Global_active_power, V = ds$Voltage, GI = ds$Global_intensity), 
@@ -109,12 +95,12 @@ move.V$SD <- runSD(move.V$Raw, n=20)
 move.GI$SD <- runSD(move.GI$Raw, n=20)
 
 ## find anomalies
-
 #### Global Active Power anomalies
 anomaly.GAP <- move.GAP$Raw[( ((move.GAP$Raw < move.GAP$Mean - z*move.GAP$SD) | (move.GAP$Raw > move.GAP$Mean + z*move.GAP$SD)) & !is.na(move.GAP$Mean) )]
 anomaly.GAP <- anomaly.GAP[!is.na(anomaly.GAP)]
 ## accumulate indices
 anomaly.GAP.idx <- which((move.GAP$Raw < move.GAP$Mean - z*move.GAP$SD | move.GAP$Raw > move.GAP$Mean + z*move.GAP$SD) & !is.na(move.GAP$Mean) )
+
 
 #### Global Reactive Power anomalies
 anomaly.GRP <- move.GRP$Raw[( ((move.GRP$Raw < move.GRP$Mean - z*move.GRP$SD) | (move.GRP$Raw > move.GRP$Mean + z*move.GRP$SD)) & !is.na(move.GRP$Mean) )]
@@ -122,11 +108,13 @@ anomaly.GRP <- anomaly.GRP[!is.na(anomaly.GRP)]
 ## accumulate indices
 anomaly.GRP.idx <- which((move.GRP$Raw < move.GRP$Mean - z*move.GRP$SD | move.GRP$Raw > move.GRP$Mean + z*move.GRP$SD) & !is.na(move.GRP$Mean) )
 
+
 #### Voltage anomalies
 anomaly.V <- move.V$Raw[( ((move.V$Raw < move.V$Mean - z*move.V$SD) | (move.V$Raw > move.V$Mean + z*move.V$SD)) & !is.na(move.V$Mean) )]
 anomaly.V <- anomaly.V[!is.na(anomaly.V)]
 ## accumulate indices
 anomaly.V.idx <- which((move.V$Raw < move.V$Mean - z*move.V$SD | move.V$Raw > move.V$Mean + z*move.V$SD) & !is.na(move.V$Mean) )
+
 
 #### Global Intensity anomalies
 anomaly.GI <- move.GI$Raw[( ((move.GI$Raw < move.GI$Mean - z*move.GI$SD) | (move.GI$Raw > move.GI$Mean + z*move.GI$SD)) & !is.na(move.GI$Mean) )]
