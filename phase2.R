@@ -86,7 +86,7 @@ for (i in 1:12) {
   points(above.idx,above, col='chocolate2', pch=20, lwd=2)
   abline(month.maxs$GAP[i],0,col='green',lwd=3)
   abline(month.mins$GAP[i],0,col='green',lwd=3)
-  legend(x=0,y=0,c('Above','Normal','Below'),cex=.8,col=c('chocolate2','black','red'),pch=c(20,20,20))
+  legend('topright',c('Above','Normal','Below'),cex=.8,col=c('chocolate2','black','red'),pch=c(20,20,20))
 }
 
 ###########################################
