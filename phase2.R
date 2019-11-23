@@ -1,14 +1,116 @@
 library(lubridate)
+library(depmixS4)
 library(TTR)
 
-ds <- data
-test <- na.omit(
-          read.csv("C:/Users/Sidd/Desktop/github/cmpt318-term-project/test_data/test1.txt")
-          #  read.csv('U:/cmpt318/test_data/test1.txt')
-          #  read.csv('~/git/cmpt318-term-project/test_data/test1.txt')
-        );
 
-### APROACH 1
+## function to set up test data set 1 for `day` from time `start` to `end`
+init.t1 <- function(day, start, end) {
+  ### TEST SET 1
+  raw <- read.csv("C:/Users/Sidd/Desktop/github/cmpt318-term-project/test_data/test1.txt")
+         #  read.csv('U:/cmpt318/test_data/test1.txt')
+         #  read.csv('~/git/cmpt318-term-project/test_data/test1.txt')
+  
+  ## FILTER FOR `NA`
+  td <- raw[!is.na(raw$Global_active_power) & !is.na(raw$Global_reactive_power) 
+            & !is.na(raw$Global_intensity) & !is.na(raw$Voltage),]
+  
+  ## FILTER FOR "day" from "start" to "end" times
+  doi <- td[(as.POSIXlt(td$Date, format='%d/%m/%Y')$wday==day 
+             & hour(as.POSIXlt(td$Time, format='%H:%M:%S'))>=start 
+             & hour(as.POSIXlt(td$Time, format='%H:%M:%S'))<=end),]
+  return(doi)
+}
+
+## function to set up test data set 2 for `day` from time `start` to `end`
+init.t2 <- function(day, start, end){
+  ### TEST SET 2
+  raw <- read.csv("C:/Users/Sidd/Desktop/github/cmpt318-term-project/test_data/test2.txt")
+  #  read.csv('U:/cmpt318/test_data/test2.txt')
+  #  read.csv('~/git/cmpt318-term-project/test_data/test2.txt')
+  
+  ## FILTER FOR `NA`
+  td <- raw[!is.na(raw$Global_active_power) & !is.na(raw$Global_reactive_power) 
+            & !is.na(raw$Global_intensity) & !is.na(raw$Voltage),]
+  
+  ## FILTER FOR "day" from "start" to "end" times
+  doi <- td[(as.POSIXlt(td$Date, format='%d/%m/%Y')$wday==day 
+             & hour(as.POSIXlt(td$Time, format='%H:%M:%S'))>=start 
+             & hour(as.POSIXlt(td$Time, format='%H:%M:%S'))<=end),]
+ return(doi) 
+}
+
+## function to set up test data set 3 for `day` from time `start` to `end`
+init.t3 <- function(day, start, end){
+  ### TEST SET 3
+  raw <- read.csv("C:/Users/Sidd/Desktop/github/cmpt318-term-project/test_data/test3.txt")
+  #  read.csv('U:/cmpt318/test_data/test3.txt')
+  #  read.csv('~/git/cmpt318-term-project/test_data/test3.txt')
+  
+  ## FILTER FOR `NA`
+  td <- raw[!is.na(raw$Global_active_power) & !is.na(raw$Global_reactive_power) 
+            & !is.na(raw$Global_intensity) & !is.na(raw$Voltage),]
+  
+  ## FILTER FOR "day" from "start" to "end" times
+  doi <- td[(as.POSIXlt(td$Date, format='%d/%m/%Y')$wday==day 
+                & hour(as.POSIXlt(td$Time, format='%H:%M:%S'))>=start 
+                & hour(as.POSIXlt(td$Time, format='%H:%M:%S'))<=end),]
+  return(doi)
+}
+
+## function to set up test data set 4 for `day` from time `start` to `end`
+init.t4 <- function(day, start, end){ 
+  ### TEST SET 4
+  raw <- read.csv("C:/Users/Sidd/Desktop/github/cmpt318-term-project/test_data/test4.txt")
+  #  read.csv('U:/cmpt318/test_data/test4.txt')
+  #  read.csv('~/git/cmpt318-term-project/test_data/test4.txt')
+  
+  ## FILTER FOR `NA`
+  td <- raw[!is.na(raw$Global_active_power) & !is.na(raw$Global_reactive_power) 
+            & !is.na(raw$Global_intensity) & !is.na(raw$Voltage),]
+  
+  ## FILTER FOR "day" from "start" to "end" times
+  doi <- td[(as.POSIXlt(td$Date, format='%d/%m/%Y')$wday==day 
+                & hour(as.POSIXlt(td$Time, format='%H:%M:%S'))>=start 
+                & hour(as.POSIXlt(td$Time, format='%H:%M:%S'))<=end),]
+  return(doi)
+}
+
+## function to set up test data set 5 for `day` from time `start` to `end`
+init.t5 <- function(day, start, end){
+  ### TEST SET 5
+  raw <- read.csv("C:/Users/Sidd/Desktop/github/cmpt318-term-project/test_data/test5.txt")
+  #  read.csv('U:/cmpt318/test_data/test5.txt')
+  #  read.csv('~/git/cmpt318-term-project/test_data/test5.txt')
+  
+  ## FILTER FOR `NA`
+  td <- raw[!is.na(raw$Global_active_power) & !is.na(raw$Global_reactive_power) 
+            & !is.na(raw$Global_intensity) & !is.na(raw$Voltage),]
+  
+  ## FILTER FOR "day" from "start" to "end" times
+  doi <- td[(as.POSIXlt(td$Date, format='%d/%m/%Y')$wday==day 
+                & hour(as.POSIXlt(td$Time, format='%H:%M:%S'))>=start 
+                & hour(as.POSIXlt(td$Time, format='%H:%M:%S'))<=end),]
+  return(doi)
+}
+
+
+ds <- data
+
+test1 <- init.t1(3,16,18)
+test2 <- init.t2(3,16,18)
+test3 <- init.t3(3,16,18)
+test4 <- init.t4(3,16,18)
+test5 <- init.t5(3,16,18)
+
+
+
+#           _____  _____  _____   ____          _____ _    _       __ 
+#     /\   |  __ \|  __ \|  __ \ / __ \   /\   / ____| |  | |  _  /_ |
+#    /  \  | |__) | |__) | |__) | |  | | /  \ | |    | |__| | (_)  | |
+#   / /\ \ |  ___/|  ___/|  _  /| |  | |/ /\ \| |    |  __  |      | |
+#  / ____ \| |    | |    | | \ \| |__| / ____ \ |____| |  | |  _   | |
+# /_/    \_\_|    |_|    |_|  \_\\____/_/    \_\_____|_|  |_| (_)  |_|
+
 
 ###########################################
 ###########   CHARACTERISTIC 1   ##########
@@ -41,10 +143,11 @@ month.name <- function(n) {
                                                                    ifelse(n==11, 'November', 'December')))))))))))
 }
 
-## plot point-anomalies for each month GAP
+
+## plot point-anomalies for each month GAP for test set `test1`
 for (i in 1:12) {
   ## Get raw month data
-  m <- test[month(test$Date)==i & test$Global_active_power >= 0, ]
+  m <- test1[month(test1$Date)==i & test1$Global_active_power >= 0, ]
   
   ## Find points below min and their indices
   below <- m$Global_active_power[m$Global_active_power < month.mins$GAP[i]]
@@ -57,14 +160,119 @@ for (i in 1:12) {
   ## Plot them mofos
   layout(1)
   plot(
-    m$Global_active_power, main=paste('Anomalies for',month.name(i), sep=' '), 
-    col='black', lwd=1, xlab=paste('Minutes of ',month.name(i), sep=' '), xaxt='n', ylab='Global Active Power',
-    panel.first=grid(NULL,NULL,lwd=1,col='gray'), pch=20
+    m$Global_active_power, main=paste('Anomalies for Testing Set #1:',month.name(i), sep=' '),
+    col='#4363d8', lwd=2, xlab=paste('Minutes of ',month.name(i), sep=' '), xaxt='n', ylab='Global Active Power',
+    panel.first=grid(NULL,NULL,lwd=1,col='gray')
   )
-  points(below.idx,below, col='red', pch=20, lwd=1)
-  points(above.idx,above, col='chocolate2', pch=20, lwd=2)
-  legend('topleft', c('Above','Normal','Below'), cex=0.7, col=c('chocolate2','black','red'),pch=c(20,20,20))
+  lines(below.idx,below, col='#800000', lwd=2, type='b')
+  lines(above.idx,above, col='#E6194B', lwd=2, type='b')
+  legend('topleft', c('Above','Normal','Below'), cex=0.5, col=c('#E6194B','#4363d8','#800000'), lwd=2)
 }
+
+
+## plot point-anomalies for each month GAP for test set `test2`
+for (i in 1:12) {
+  ## Get raw month data
+  m <- test2[month(test2$Date)==i & test2$Global_active_power >= 0, ]
+  
+  ## Find points below min and their indices
+  below <- m$Global_active_power[m$Global_active_power < month.mins$GAP[i]]
+  below.idx <- which(m$Global_active_power < month.mins$GAP[i])
+  
+  ## Find points above max and their indices
+  above <- m$Global_active_power[m$Global_active_power > month.maxs$GAP[i]]
+  above.idx <- which(m$Global_active_power > month.maxs$GAP[i])
+  
+  ## Plot them mofos
+  layout(1)
+  plot(
+    m$Global_active_power, main=paste('Anomalies for Testing Set #2:',month.name(i), sep=' '),
+    col='#4363d8', lwd=2, xlab=paste('Minutes of ',month.name(i), sep=' '), xaxt='n', ylab='Global Active Power',
+    panel.first=grid(NULL,NULL,lwd=1,col='gray')
+  )
+  lines(below.idx,below, col='#800000', lwd=2, type='b')
+  lines(above.idx,above, col='#E6194B', lwd=2, type='b')
+  legend('topleft', c('Above','Normal','Below'), cex=0.5, col=c('#E6194B','#4363d8','#800000'), lwd=2)
+}
+
+
+## plot point-anomalies for each month GAP for test set `test3`
+for (i in 1:12) {
+  ## Get raw month data
+  m <- test3[month(test3$Date)==i & test3$Global_active_power >= 0, ]
+  
+  ## Find points below min and their indices
+  below <- m$Global_active_power[m$Global_active_power < month.mins$GAP[i]]
+  below.idx <- which(m$Global_active_power < month.mins$GAP[i])
+  
+  ## Find points above max and their indices
+  above <- m$Global_active_power[m$Global_active_power > month.maxs$GAP[i]]
+  above.idx <- which(m$Global_active_power > month.maxs$GAP[i])
+  
+  ## Plot them mofos
+  layout(1)
+  plot(
+    m$Global_active_power, main=paste('Anomalies for Testing Set #3:',month.name(i), sep=' '),
+    col='#4363d8', lwd=2, xlab=paste('Minutes of ',month.name(i), sep=' '), xaxt='n', ylab='Global Active Power',
+    panel.first=grid(NULL,NULL,lwd=1,col='gray')
+  )
+  lines(below.idx,below, col='#800000', lwd=2, type='b')
+  lines(above.idx,above, col='#E6194B', lwd=2, type='b')
+  legend('topleft', c('Above','Normal','Below'), cex=0.5, col=c('#E6194B','#4363d8','#800000'), lwd=2)
+}
+
+
+## plot point-anomalies for each month GAP for test set `test4`
+for (i in 1:12) {
+  ## Get raw month data
+  m <- test4[month(test4$Date)==i & test4$Global_active_power >= 0, ]
+  
+  ## Find points below min and their indices
+  below <- m$Global_active_power[m$Global_active_power < month.mins$GAP[i]]
+  below.idx <- which(m$Global_active_power < month.mins$GAP[i])
+  
+  ## Find points above max and their indices
+  above <- m$Global_active_power[m$Global_active_power > month.maxs$GAP[i]]
+  above.idx <- which(m$Global_active_power > month.maxs$GAP[i])
+  
+  ## Plot them mofos
+  layout(1)
+  plot(
+    m$Global_active_power, main=paste('Anomalies for Testing Set #4:',month.name(i), sep=' '),
+    col='#4363d8', lwd=2, xlab=paste('Minutes of ',month.name(i), sep=' '), xaxt='n', ylab='Global Active Power',
+    panel.first=grid(NULL,NULL,lwd=1,col='gray')
+  )
+  lines(below.idx,below, col='#800000', lwd=2, type='b')
+  lines(above.idx,above, col='#E6194B', lwd=2, type='b')
+  legend('topleft', c('Above','Normal','Below'), cex=0.5, col=c('#E6194B','#4363d8','#800000'), lwd=2)
+}
+
+
+## plot point-anomalies for each month GAP for test set `test5`
+for (i in 1:12) {
+  ## Get raw month data
+  m <- test5[month(test5$Date)==i & test5$Global_active_power >= 0, ]
+  
+  ## Find points below min and their indices
+  below <- m$Global_active_power[m$Global_active_power < month.mins$GAP[i]]
+  below.idx <- which(m$Global_active_power < month.mins$GAP[i])
+  
+  ## Find points above max and their indices
+  above <- m$Global_active_power[m$Global_active_power > month.maxs$GAP[i]]
+  above.idx <- which(m$Global_active_power > month.maxs$GAP[i])
+  
+  ## Plot them mofos
+  layout(1)
+  plot(
+    m$Global_active_power, main=paste('Anomalies for Testing Set #5:',month.name(i), sep=' '),
+    col='#4363d8', lwd=2, xlab=paste('Minutes of ',month.name(i), sep=' '), xaxt='n', ylab='Global Active Power',
+    panel.first=grid(NULL,NULL,lwd=1,col='gray')
+  )
+  lines(below.idx,below, col='#800000', lwd=2, type='b')
+  lines(above.idx,above, col='#E6194B', lwd=2, type='b')
+  legend('topleft', c('Above','Normal','Below'), cex=0.5, col=c('#E6194B','#4363d8','#800000'), lwd=2)
+}
+
 
 ############################################
 ###########   CHARACTERISTIC 2   ###########
@@ -75,9 +283,10 @@ z <- 3
 # A data value is an anomaly if its mean is not in [mean-z*SD, mean+z*SD]
 # Can be changed to modify sensitivity to point anomalies
 
+## plot moving average anomalies for `test1`
 for (i in 1:12) {
   # get raw data for month `i`
-  raw.data <- data.frame(Raw = test$Global_active_power[test$Global_active_power>=0 & month(test$Date)==i])
+  raw.data <- data.frame(Raw = test1$Global_active_power[test1$Global_active_power>=0 & month(test1$Date)==i])
   
   # find moving averages
   raw.data$Mean <- runMean(raw.data$Raw, n=20)
@@ -108,11 +317,20 @@ for (i in 1:12) {
   
   # plot them anomalies
   plot(
-    raw.data$Raw, main=paste('Moving average Anomalies:',month.name(i), sep=' '), col='black', pch=20,
+    raw.data$Raw, main=paste('Moving average Anomalies:',month.name(i), sep=' '), col='#F58231', pch=20,
     lwd=1, xlab='Minutes', xaxt='n', ylab='Global Active Power', 
     panel.first = grid(NULL, NULL, lwd=1, col='gray')
   )
-  points(anomalies.idx, anomalies, col='chocolate2', lwd=2)
-  legend('topleft', c('Anomalies','Normal'), cex=0.65, pch=c(20,20), col=c('red','black'))
-  
+  lines(anomalies.idx, anomalies, col='black', lwd=2, type='b')
+  legend('topleft', c('Anomalies','Normal'), cex=0.5, pch=c(20,20), col=c('red','black'))
 }
+
+
+#           _____  _____  _____   ____          _____ _    _       ___  
+#     /\   |  __ \|  __ \|  __ \ / __ \   /\   / ____| |  | |  _  |__ \ 
+#    /  \  | |__) | |__) | |__) | |  | | /  \ | |    | |__| | (_)    ) |
+#   / /\ \ |  ___/|  ___/|  _  /| |  | |/ /\ \| |    |  __  |       / / 
+#  / ____ \| |    | |    | | \ \| |__| / ____ \ |____| |  | |  _   / /_ 
+# /_/    \_\_|    |_|    |_|  \_\\____/_/    \_\_____|_|  |_| (_) |____|
+
+
