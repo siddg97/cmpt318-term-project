@@ -2,7 +2,8 @@ library(lubridate);
 
 #### function to set up training data. filter for NAs and wednedsday time intervals
 init <- function(day, start, end) {
-  raw <- read.csv("~/git/cmpt318-term-project/TrainData.txt")
+  raw <- read.csv("C:/Users/Sidd/Desktop/github/cmpt318-term-project/TrainData.txt")
+  # read.csv("~/git/cmpt318-term-project/TrainData.txt")
   # read.csv("C:/Users/sga94/Desktop/cmpt318-term-project-master/TrainData.txt")
   ## FILTER FOR `NA`
   td <- raw[!is.na(raw$Global_active_power) & !is.na(raw$Global_reactive_power) 
@@ -58,7 +59,7 @@ plot.minute <- function(data,s,e) {
   for (i in seq(s,e,10)) {
     times <- c(times, time.to.str(i))
   }
-  layout(1)
+  # layout(1)
   plot(
     s:e, avg.min, col='darkred', type='o', xlab='Time [24 hour clock]', xaxt='n',
     ylab='Global Active Power', main='Average for each minute',
@@ -79,7 +80,7 @@ explore.week <- function(data) {
   sd.week <- aggregate(data$Global_active_power, by=list(week(as.Date(data$Date, format='%d/%m/%Y'))), sd)
   
   ## PLOTS
-  layout(1:2)
+  # layout(1:2)
   plot(
     mean.week, type='o', col='red3', lwd=3, 
     main='Average for each week', xlab='Week', ylab='Global Active Power',
@@ -106,7 +107,7 @@ explore.month <- function(data) {
   sd.month <- aggregate(data$Global_active_power, by=list(month(as.Date(data$Date, format='%d/%m/%Y'))), sd)
   
   ## PLOTS
-  layout(1:2)
+  # layout(1:2)
   plot(
     mean.month, type='o', col='royalblue3', lwd=3,
     main='Average for each month', xlab='Month', ylab='Global Active Power',
@@ -134,7 +135,7 @@ explore.season <- function(data) {
   sd.season <- aggregate(data$Global_active_power, by=list(season(data$Date)), sd)
   names(sd.season) <- c('Season', 'Sd')
   ## PLOTS
-  layout(1:2)
+  # layout(1:2)
   plot(mean.season$Global_active_power, type='o', col='slateblue4', lwd=3, ylab='Global Active Power',
        xlab='',main='Average for each season', xaxt='n',
        panel.first = grid(NULL,NULL,lwd=1,col='gray') 
@@ -216,3 +217,4 @@ data <- init(3,16,18)               # init(day_number, start_time, end_time)
 c1.result <- c1(data)
 ## perform c2 tasks
 c2.result <- c2(data)
+
