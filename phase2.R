@@ -283,6 +283,7 @@ z <- 3
 # A data value is an anomaly if its mean is not in [mean-z*SD, mean+z*SD]
 # Can be changed to modify sensitivity to point anomalies
 
+
 ## plot moving average anomalies for `test1`
 for (i in 1:12) {
   # get raw data for month `i`
@@ -304,26 +305,199 @@ for (i in 1:12) {
   # plot the moving average curve
   plot(
     raw.data$Mean, type='l', lwd=2, col='red', xlab='Minutes', ylab='Global Active Power', 
-    main=paste('Moving average curve:', month.name(i), sep=' '),
+    main=paste('Test Set #1: Moving average curve -', month.name(i), sep=' '),
     panel.first= grid(NULL,NULL, lwd=1,col='gray')
   )
   
   # plot the moving SD curve
   plot(
     raw.data$SD, type='l', lwd=2, col='chartreuse4', xlab='Minutes', ylab='Global Active Power',
-    main=paste('Moving SD curve:', month.name(i), sep=' '),
+    main=paste('Test Set #1: Moving SD curve -', month.name(i), sep=' '),
     panel.first= grid(NULL,NULL, lwd=1,col='gray')
   )
   
   # plot them anomalies
   plot(
-    raw.data$Raw, main=paste('Moving average Anomalies:',month.name(i), sep=' '), col='#F58231', pch=20,
+    raw.data$Raw, main=paste('Test Set #1: Moving average Anomalies -',month.name(i), sep=' '), col='#F58231', pch=20,
     lwd=1, xlab='Minutes', xaxt='n', ylab='Global Active Power', 
     panel.first = grid(NULL, NULL, lwd=1, col='gray')
   )
   lines(anomalies.idx, anomalies, col='black', lwd=2, type='b')
   legend('topleft', c('Anomalies','Normal'), cex=0.5, pch=c(20,20), col=c('red','black'))
 }
+
+
+## plot moving average anomalies for `test2`
+for (i in 1:12) {
+  # get raw data for month `i`
+  raw.data <- data.frame(Raw = test2$Global_active_power[test2$Global_active_power>=0 & month(test2$Date)==i])
+  
+  # find moving averages
+  raw.data$Mean <- runMean(raw.data$Raw, n=20)
+  
+  # find the moving SD's
+  raw.data$SD <- runSD(raw.data$Raw, n=20)
+  
+  # find anomalies
+  anomalies <- raw.data$Raw[ ((raw.data$Raw < raw.data$Mean - z*raw.data$SD) | (raw.data$Raw > raw.data$Mean + z*raw.data$SD)) & !is.na(raw.data$Mean)]
+  anomalies <- anomalies[!is.na(anomalies)]
+  
+  # find anomalous indices
+  anomalies.idx <- which(((raw.data$Raw < raw.data$Mean - z*raw.data$SD) | (raw.data$Raw > raw.data$Mean + z*raw.data$SD)) & !is.na(raw.data$Mean))
+  
+  # plot the moving average curve
+  plot(
+    raw.data$Mean, type='l', lwd=2, col='red', xlab='Minutes', ylab='Global Active Power', 
+    main=paste('Test Set #2: Moving average curve -', month.name(i), sep=' '),
+    panel.first= grid(NULL,NULL, lwd=1,col='gray')
+  )
+  
+  # plot the moving SD curve
+  plot(
+    raw.data$SD, type='l', lwd=2, col='chartreuse4', xlab='Minutes', ylab='Global Active Power',
+    main=paste('Test Set #2: Moving SD curve -', month.name(i), sep=' '),
+    panel.first= grid(NULL,NULL, lwd=1,col='gray')
+  )
+  
+  # plot them anomalies
+  plot(
+    raw.data$Raw, main=paste('Test Set #2: Moving average Anomalies -',month.name(i), sep=' '), col='#F58231', pch=20,
+    lwd=1, xlab='Minutes', xaxt='n', ylab='Global Active Power', 
+    panel.first = grid(NULL, NULL, lwd=1, col='gray')
+  )
+  lines(anomalies.idx, anomalies, col='black', lwd=2, type='b')
+  legend('topleft', c('Anomalies','Normal'), cex=0.5, pch=c(20,20), col=c('red','black'))
+}
+
+
+## plot moving average anomalies for `test3`
+for (i in 1:12) {
+  # get raw data for month `i`
+  raw.data <- data.frame(Raw = test3$Global_active_power[test3$Global_active_power>=0 & month(test3$Date)==i])
+  
+  # find moving averages
+  raw.data$Mean <- runMean(raw.data$Raw, n=20)
+  
+  # find the moving SD's
+  raw.data$SD <- runSD(raw.data$Raw, n=20)
+  
+  # find anomalies
+  anomalies <- raw.data$Raw[ ((raw.data$Raw < raw.data$Mean - z*raw.data$SD) | (raw.data$Raw > raw.data$Mean + z*raw.data$SD)) & !is.na(raw.data$Mean)]
+  anomalies <- anomalies[!is.na(anomalies)]
+  
+  # find anomalous indices
+  anomalies.idx <- which(((raw.data$Raw < raw.data$Mean - z*raw.data$SD) | (raw.data$Raw > raw.data$Mean + z*raw.data$SD)) & !is.na(raw.data$Mean))
+  
+  # plot the moving average curve
+  plot(
+    raw.data$Mean, type='l', lwd=2, col='red', xlab='Minutes', ylab='Global Active Power', 
+    main=paste('Test Set #3: Moving average curve -', month.name(i), sep=' '),
+    panel.first= grid(NULL,NULL, lwd=1,col='gray')
+  )
+  
+  # plot the moving SD curve
+  plot(
+    raw.data$SD, type='l', lwd=2, col='chartreuse4', xlab='Minutes', ylab='Global Active Power',
+    main=paste('Test Set #3: Moving SD curve -', month.name(i), sep=' '),
+    panel.first= grid(NULL,NULL, lwd=1,col='gray')
+  )
+  
+  # plot them anomalies
+  plot(
+    raw.data$Raw, main=paste('Test Set #3: Moving average Anomalies -',month.name(i), sep=' '), col='#F58231', pch=20,
+    lwd=1, xlab='Minutes', xaxt='n', ylab='Global Active Power', 
+    panel.first = grid(NULL, NULL, lwd=1, col='gray')
+  )
+  lines(anomalies.idx, anomalies, col='black', lwd=2, type='b')
+  legend('topleft', c('Anomalies','Normal'), cex=0.5, pch=c(20,20), col=c('red','black'))
+}
+
+
+## plot moving average anomalies for `test4`
+for (i in 1:12) {
+  # get raw data for month `i`
+  raw.data <- data.frame(Raw = test4$Global_active_power[test4$Global_active_power>=0 & month(test4$Date)==i])
+  
+  # find moving averages
+  raw.data$Mean <- runMean(raw.data$Raw, n=20)
+  
+  # find the moving SD's
+  raw.data$SD <- runSD(raw.data$Raw, n=20)
+  
+  # find anomalies
+  anomalies <- raw.data$Raw[ ((raw.data$Raw < raw.data$Mean - z*raw.data$SD) | (raw.data$Raw > raw.data$Mean + z*raw.data$SD)) & !is.na(raw.data$Mean)]
+  anomalies <- anomalies[!is.na(anomalies)]
+  
+  # find anomalous indices
+  anomalies.idx <- which(((raw.data$Raw < raw.data$Mean - z*raw.data$SD) | (raw.data$Raw > raw.data$Mean + z*raw.data$SD)) & !is.na(raw.data$Mean))
+  
+  # plot the moving average curve
+  plot(
+    raw.data$Mean, type='l', lwd=2, col='red', xlab='Minutes', ylab='Global Active Power', 
+    main=paste('Test Set #4: Moving average curve -', month.name(i), sep=' '),
+    panel.first= grid(NULL,NULL, lwd=1,col='gray')
+  )
+  
+  # plot the moving SD curve
+  plot(
+    raw.data$SD, type='l', lwd=2, col='chartreuse4', xlab='Minutes', ylab='Global Active Power',
+    main=paste('Test Set #4: Moving SD curve -', month.name(i), sep=' '),
+    panel.first= grid(NULL,NULL, lwd=1,col='gray')
+  )
+  
+  # plot them anomalies
+  plot(
+    raw.data$Raw, main=paste('Test Set #4: Moving average Anomalies -',month.name(i), sep=' '), col='#F58231', pch=20,
+    lwd=1, xlab='Minutes', xaxt='n', ylab='Global Active Power', 
+    panel.first = grid(NULL, NULL, lwd=1, col='gray')
+  )
+  lines(anomalies.idx, anomalies, col='black', lwd=2, type='b')
+  legend('topleft', c('Anomalies','Normal'), cex=0.5, pch=c(20,20), col=c('red','black'))
+}
+
+
+## plot moving average anomalies for `test5`
+for (i in 1:12) {
+  # get raw data for month `i`
+  raw.data <- data.frame(Raw = test5$Global_active_power[test5$Global_active_power>=0 & month(test5$Date)==i])
+  
+  # find moving averages
+  raw.data$Mean <- runMean(raw.data$Raw, n=20)
+  
+  # find the moving SD's
+  raw.data$SD <- runSD(raw.data$Raw, n=20)
+  
+  # find anomalies
+  anomalies <- raw.data$Raw[ ((raw.data$Raw < raw.data$Mean - z*raw.data$SD) | (raw.data$Raw > raw.data$Mean + z*raw.data$SD)) & !is.na(raw.data$Mean)]
+  anomalies <- anomalies[!is.na(anomalies)]
+  
+  # find anomalous indices
+  anomalies.idx <- which(((raw.data$Raw < raw.data$Mean - z*raw.data$SD) | (raw.data$Raw > raw.data$Mean + z*raw.data$SD)) & !is.na(raw.data$Mean))
+  
+  # plot the moving average curve
+  plot(
+    raw.data$Mean, type='l', lwd=2, col='red', xlab='Minutes', ylab='Global Active Power', 
+    main=paste('Test Set #5: Moving average curve -', month.name(i), sep=' '),
+    panel.first= grid(NULL,NULL, lwd=1,col='gray')
+  )
+  
+  # plot the moving SD curve
+  plot(
+    raw.data$SD, type='l', lwd=2, col='chartreuse4', xlab='Minutes', ylab='Global Active Power',
+    main=paste('Test Set #5: Moving SD curve -', month.name(i), sep=' '),
+    panel.first= grid(NULL,NULL, lwd=1,col='gray')
+  )
+  
+  # plot them anomalies
+  plot(
+    raw.data$Raw, main=paste('Test Set #5: Moving average Anomalies -',month.name(i), sep=' '), col='#F58231', pch=20,
+    lwd=1, xlab='Minutes', xaxt='n', ylab='Global Active Power', 
+    panel.first = grid(NULL, NULL, lwd=1, col='gray')
+  )
+  lines(anomalies.idx, anomalies, col='black', lwd=2, type='b')
+  legend('topleft', c('Anomalies','Normal'), cex=0.5, pch=c(20,20), col=c('red','black'))
+}
+
 
 
 #           _____  _____  _____   ____          _____ _    _       ___  
