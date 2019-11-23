@@ -94,7 +94,7 @@ init.t5 <- function(day, start, end){
 }
 
 
-ds <- data
+train.data <- data
 
 test1 <- init.t1(3,16,18)
 test2 <- init.t2(3,16,18)
@@ -118,15 +118,15 @@ test5 <- init.t5(3,16,18)
 
 ## [TRAINING DATA] Monthly minimums for wednesday evenings for GAP, V and GI
 month.mins <- aggregate(
-                  list(GAP = ds$Global_active_power, V = ds$Voltage, GI = ds$Global_intensity), 
-                  by= list(Month = month(as.Date(ds$Date, format='%d/%m/%Y'))), 
+                  list(GAP = train.data$Global_active_power, V = train.data$Voltage, GI = train.data$Global_intensity), 
+                  by= list(Month = month(as.Date(train.data$Date, format='%d/%m/%Y'))), 
                   FUN = min
               )
 
 ## [TRAINING DATA] Monthly maximums for wednesday evenings for GAP, V and GI
 month.maxs <- aggregate(
-                  list(GAP = ds$Global_active_power, V = ds$Voltage, GI = ds$Global_intensity), 
-                  by= list(Month = month(as.Date(ds$Date, format='%d/%m/%Y'))), 
+                  list(GAP = train.data$Global_active_power, V = train.data$Voltage, GI = train.data$Global_intensity), 
+                  by= list(Month = month(as.Date(train.data$Date, format='%d/%m/%Y'))), 
                   FUN = max
               )
 month.name <- function(n) {
@@ -318,12 +318,12 @@ for (i in 1:12) {
   
   # plot them anomalies
   plot(
-    raw.data$Raw, main=paste('Test Set #1: Moving average Anomalies -',month.name(i), sep=' '), col='#F58231', pch=20,
-    lwd=1, xlab='Minutes', xaxt='n', ylab='Global Active Power', 
+    raw.data$Raw, main=paste('Test Set #1: Moving average Anomalies -',month.name(i), sep=' '), 
+    col='#F58231', pch=20, lwd=1, xlab='Minutes', xaxt='n', ylab='Global Active Power', 
     panel.first = grid(NULL, NULL, lwd=1, col='gray')
   )
   lines(anomalies.idx, anomalies, col='black', lwd=2, type='b')
-  legend('topleft', c('Anomalies','Normal'), cex=0.5, pch=c(20,20), col=c('red','black'))
+  legend('topleft', c('Normal','Anomalies'), cex=0.5, pch=c(20,20), col=c('#F58231','black'))
 }
 
 
@@ -366,7 +366,7 @@ for (i in 1:12) {
     panel.first = grid(NULL, NULL, lwd=1, col='gray')
   )
   lines(anomalies.idx, anomalies, col='black', lwd=2, type='b')
-  legend('topleft', c('Anomalies','Normal'), cex=0.5, pch=c(20,20), col=c('red','black'))
+  legend('topleft', c('Normal','Anomalies'), cex=0.5, pch=c(20,20), col=c('#F58231','black'))
 }
 
 
@@ -409,7 +409,7 @@ for (i in 1:12) {
     panel.first = grid(NULL, NULL, lwd=1, col='gray')
   )
   lines(anomalies.idx, anomalies, col='black', lwd=2, type='b')
-  legend('topleft', c('Anomalies','Normal'), cex=0.5, pch=c(20,20), col=c('red','black'))
+  legend('topleft', c('Normal','Anomalies'), cex=0.5, pch=c(20,20), col=c('#F58231','black'))
 }
 
 
@@ -452,7 +452,7 @@ for (i in 1:12) {
     panel.first = grid(NULL, NULL, lwd=1, col='gray')
   )
   lines(anomalies.idx, anomalies, col='black', lwd=2, type='b')
-  legend('topleft', c('Anomalies','Normal'), cex=0.5, pch=c(20,20), col=c('red','black'))
+  legend('topleft', c('Normal','Anomalies'), cex=0.5, pch=c(20,20), col=c('#F58231','black'))
 }
 
 
@@ -495,7 +495,7 @@ for (i in 1:12) {
     panel.first = grid(NULL, NULL, lwd=1, col='gray')
   )
   lines(anomalies.idx, anomalies, col='black', lwd=2, type='b')
-  legend('topleft', c('Anomalies','Normal'), cex=0.5, pch=c(20,20), col=c('red','black'))
+  legend('topleft', c('Normal','Anomalies'), cex=0.5, pch=c(20,20), col=c('#F58231','black'))
 }
 
 
@@ -507,4 +507,6 @@ for (i in 1:12) {
 #  / ____ \| |    | |    | | \ \| |__| / ____ \ |____| |  | |  _   / /_ 
 # /_/    \_\_|    |_|    |_|  \_\\____/_/    \_\_____|_|  |_| (_) |____|
 
+
+set.seed(1)
 
