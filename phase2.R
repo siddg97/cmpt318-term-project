@@ -642,19 +642,20 @@ ns.df.multi <- plot.bic.state(train.data, 2, 30, is.multi=TRUE)
 
 ### NEED TO SET THIS ACCORDING TO plots obtained 
 ### from the above 2 calls to plot.bic.state() 
-op.states <- 10
+op.states     <- 10
+op.states.uni <- 28
 
 ## Train model using the optimal nstate value
-trained.mod       <- train.model(train.data, n=op.states)
+trained.mod       <- train.model(train.data, n=op.states.uni)
 ## Train multivariate using the optimal nstate value
 trained.multi.mod <- train.multi.model(train.data, n=op.states)
 
 ## test all 5 test data sets for univariate
-t1.ll <- test.model(trained.mod, test1, op.states)
-t2.ll <- test.model(trained.mod, test2, op.states)
-t3.ll <- test.model(trained.mod, test3, op.states)
-t4.ll <- test.model(trained.mod, test4, op.states)
-t5.ll <- test.model(trained.mod, test5, op.states)
+t1.ll <- test.model(trained.mod, test1, op.states.uni)
+t2.ll <- test.model(trained.mod, test2, op.states.uni)
+t3.ll <- test.model(trained.mod, test3, op.states.uni)
+t4.ll <- test.model(trained.mod, test4, op.states.uni)
+t5.ll <- test.model(trained.mod, test5, op.states.uni)
 
 ## test all 5 test data sets for multivariate
 t1.m.ll <- test.multi.model(trained.multi.mod, test1, op.states)
