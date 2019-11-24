@@ -49,7 +49,7 @@ time.to.str <- function(time.num) {
 }
 
 #### function to get average GAP plot for each minute
-plot.minute <- function(data,s,e) {
+plot.minute <- function(data,s=960,e=1260) {
   avg.min <- c()
   times   <- c()
   for (i in s:e) {
@@ -156,7 +156,7 @@ explore.season <- function(data) {
 c1 <- function(data){
   
   ## plot minute avg
-  minute.data <- plot.minute(data,960,1080)          # plot.minute(data, start_minutes, end_minutes)
+  minute.data <- plot.minute(data)          # plot.minute(data, start_minutes, end_minutes)
   
   ## plot and find week data
   week.data   <- explore.week(data)   # week.data   = list(max,min)
