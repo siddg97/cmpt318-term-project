@@ -520,8 +520,8 @@ for (i in 1:12) {
 ## +> test4 <- init.t4(3,16,18)
 ## +> test5 <- init.t5(3,16,18)
 
-# Train the initial model and fit it
-train.model <- function(model.data,n){
+## get ntimes arg for making depmix HMM given `model.data`
+get.ntimes <- function(model.data) {
   # get the all global active power and date
   training.entries <- model.data[c("Date","Global_active_power")]
   # get count of entries according year and day 
@@ -532,6 +532,13 @@ train.model <- function(model.data,n){
   colnames(num.entries) <- c('Year','Day','Count')
   # extract the count column
   num.entries <- num.entries$Count
+  return(num.entries)
+}
+
+
+# Train the initial model and fit it
+train.model <- function(model.data,n){
+  num.entries <- get.ntimes(model.data)
   
   set.seed(1)
   model = depmix(
@@ -539,21 +546,12 @@ train.model <- function(model.data,n){
             nstates=n, family=gaussian("identity"), ntimes=num.entries
           )
   fit.m = fit(model)
-  return(data.frame(Model=fit.m, Ntimes=num.entries))
+  return(fit.m)
 }
 
 # Train the intial multivariate model and fit it
 train.multi.model <- function(model.data,n) {
-  # get the all global active power and date
-  training.entries <- model.data[c("Date","Global_active_power")]
-  # get count of entries according year and day 
-  num.entries <- aggregate(training.entries$Date, by=list(Year=year(training.entries$Date), Day=day(training.entries$Date)), FUN=length)
-  # order the entries according to year
-  num.entries <- num.entries[order(num.entries$Year),]
-  # set count column name
-  colnames(num.entries) <- c('Year','Day','Count')
-  # extract the count column
-  num.entries <- num.entries$Count
+  num.entries <- get.ntimes(model.data)
   
   set.seed(1)
   model = depmix(
@@ -562,26 +560,13 @@ train.multi.model <- function(model.data,n) {
     family=list(gaussian("identity"), gaussian("identity"))
   )
   fit.m = fit(model)
-  return(data.frame(Model=fit.m, Ntimes=num.entries))
+  return(fit.m)
 }
 
 
 # Test the trained model for the given test data set
 test.model <- function(trained.model, test.data, n) {
-  # get all global active power and date
-  testing.entries <- test.data[c("Date","Global_active_power")]
-  # get count of entries according to year and day
-  num.entries <- aggregate(
-                    testing.entries$Date, 
-                    by=list(Year=year(testing.entries$Date), Day=day(testing.entries$Date)), 
-                    FUN=length
-                 )
-  # order the entries according to year
-  num.entries <- num.entries[order(num.entries$Year),]
-  # set count column name
-  colnames(num.entries) <- c("Year","Day","Count")
-  # extract the count column
-  num.entries <- num.entries$Count
+  num.entries <- get.ntimes(test.data)
   
   set.seed(1)
   model <- depmix(
@@ -596,20 +581,7 @@ test.model <- function(trained.model, test.data, n) {
 
 # Test the trained multivariate model for the given test data set
 test.multi.model <- function(trained.model, test.data, n) {
-  # get all global active power and date
-  testing.entries <- test.data[c("Date","Global_active_power")]
-  # get count of entries according to year and day
-  num.entries <- aggregate(
-    testing.entries$Date, 
-    by=list(Year=year(testing.entries$Date), Day=day(testing.entries$Date)), 
-    FUN=length
-  )
-  # order the entries according to year
-  num.entries <- num.entries[order(num.entries$Year),]
-  # set count column name
-  colnames(num.entries) <- c("Year","Day","Count")
-  # extract the count column
-  num.entries <- num.entries$Count
+  num.entries <- get.ntimes(test.data)
   
   set.seed(1)
   model <- depmix(
@@ -637,8 +609,8 @@ plot.bic.state <- function(model.data, min.s, max.s, is.multi) {
     } else {
       model <- train.multi.model(model.data, i)
     }
-    bic[index] <- BIC(model$Model)                      # Record BIC value
-    ll[index] <- logLik(model$Model)/mean(model$Ntimes) # Record normalized Log-likelihood for each wednesday time interval
+    bic[index] <- BIC(model)                                # Record BIC value
+    ll[index] <- logLik(model)/mean(get.ntimes(model.data)) # Record normalized Log-likelihood for each wednesday time interval
     index <- index+1
   }
   ## Now, bic and ll have values indexed by number of states.
