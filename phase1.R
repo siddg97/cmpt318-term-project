@@ -166,6 +166,7 @@ c1 <- function(data){
   
   ## plot and find season data
   season.data <- explore.season(data) # season.data = list(max,min)
+  
   x <- matrix(c(week.data, month.data, season.data), nrow=3, byrow=TRUE)
   rownames(x) <- c('Week', 'Month', 'Season')
   colnames(x) <- c('Max', 'Min')
