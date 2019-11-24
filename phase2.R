@@ -510,7 +510,6 @@ for (i in 1:12) {
 # /_/    \_\_|    |_|    |_|  \_\\____/_/    \_\_____|_|  |_| (_) |____|
 
 
-set.seed(1)
 ###############################
 ######### DATA VARS:###########
 ###############################
@@ -521,120 +520,173 @@ set.seed(1)
 ## +> test4 <- init.t4(3,16,18)
 ## +> test5 <- init.t5(3,16,18)
 
+# Train the initial model and fit it
+train.model <- function(model.data,n){
+  # get the all global active power and date
+  training.entries <- model.data[c("Date","Global_active_power")]
+  # get count of entries according year and day 
+  num.entries <- aggregate(training.entries$Date, by=list(Year=year(training.entries$Date), Day=day(training.entries$Date)), FUN=length)
+  # order the entries according to year
+  num.entries <- num.entries[order(num.entries$Year),]
+  # set count column name
+  colnames(num.entries) <- c('Year','Day','Count')
+  # extract the count column
+  num.entries <- num.entries[,3]
+  
+  set.seed(1)
+  model = depmix(
+            response=Global_active_power~1, data=model.data, 
+            nstates=n, family=gaussian("identity"), ntimes=num.entries
+          )
+  fit.m = fit(model)
+  return(fit.m)
+}
+
+# Train the intial multivariate model and fit it
+train.multi.model <- function(model.data,n) {
+  # get the all global active power and date
+  training.entries <- model.data[c("Date","Global_active_power")]
+  # get count of entries according year and day 
+  num.entries <- aggregate(training.entries$Date, by=list(Year=year(training.entries$Date), Day=day(training.entries$Date)), FUN=length)
+  # order the entries according to year
+  num.entries <- num.entries[order(num.entries$Year),]
+  # set count column name
+  colnames(num.entries) <- c('Year','Day','Count')
+  # extract the count column
+  num.entries <- num.entries[,3]
+  
+  set.seed(1)
+  model = depmix(
+    response=list(Global_active_power~1, Global_intensity~1), 
+    data=model.data, nstates=n, ntimes=num.entries,
+    family=list(gaussian("identity"), gaussian("identity"))
+  )
+  fit.m = fit(model)
+  return(fit.m)
+}
+
+
+# Test the trained model for the given test data set
+test.model <- function(trained.model, test.data, n) {
+  # get all global active power and date
+  testing.entries <- test.data[c("Date","Global_active_power")]
+  # get count of entries according to year and day
+  num.entries <- aggregate(
+                    testing.entries$Date, 
+                    by=list(Year=year(testing.entries$Date), Day=day(testing.entries$Date)), 
+                    FUN=length
+                 )
+  # order the entries according to year
+  num.entries <- num.entries[order(num.entries$Year),]
+  # set count column name
+  colnames(num.entries) <- c("Year","Day","Count")
+  # extract the count column
+  num.entries <- num.entries[,3]
+  
+  set.seed(1)
+  model <- depmix(
+              response=Global_active_power~1, data=test.data,
+              nstates=n, ntime=num.entries, family=gaussian("identity")
+           )
+  model <- setpars(model, getpars(trained.model))
+  fb <- forwardbackward(model)
+  
+  return(fb$logLike)
+}
+
+# Test the trained multivariate model for the given test data set
+test.multi.model <- function(trained.model, test.data, n) {
+  # get all global active power and date
+  testing.entries <- test.data[c("Date","Global_active_power")]
+  # get count of entries according to year and day
+  num.entries <- aggregate(
+    testing.entries$Date, 
+    by=list(Year=year(testing.entries$Date), Day=day(testing.entries$Date)), 
+    FUN=length
+  )
+  # order the entries according to year
+  num.entries <- num.entries[order(num.entries$Year),]
+  # set count column name
+  colnames(num.entries) <- c("Year","Day","Count")
+  # extract the count column
+  num.entries <- num.entries[,3]
+  
+  set.seed(1)
+  model <- depmix(
+    response=list(Global_active_power~1, Global_intensity~1), 
+    family=list(gaussian("identity"), gaussian("identity")), 
+    data=test.data, nstates=n, ntime=num.entries
+  )
+  model <- setpars(model, getpars(trained.model))
+  fb <- forwardbackward(model)
+  
+  return(fb$logLike)
+}
+
 
 ## Find optimal nstates and plot
-plot.bic.state <- function(model.data, min.s, max.s) {
+plot.bic.state <- function(model.data, min.s, max.s, is.multi) {
   bic <- c()
   ll <- c()
   index <- 1
   model <- NULL
   
   for (i in min.s:max.s) {
-    model <- depmix(
-                response=Global_active_power~1, data=model.data,
-                family=gaussian("identity"), nstates=i
-             )
-    fit.model <- fit(model)
-    bic[index] <- BIC(fit.model)
-    ll[index] <- logLik(fit.model)
+    if(is.multi){
+      model <- train.model(model.data, i)
+    } else {
+      model <- train.multi.model(model.data, i)
+    }
+    bic[index] <- BIC(model)
+    ll[index] <- logLik(model)
     index <- index+1
   }
   ## Now, bic and ll have values indexed by number of states.
   ## We plot them to analyse the optimal nstates for our training model
   layout(1)
   plot( #### BIC PLOT
-    min.s:max.s, bic, type='l', col='#911EB4',
-    xlab='# of states [nstates]', ylab='BIC', main='BIC vs. nstates',
+    min.s:max.s, bic, type='l', col='#911EB4', lwd=3,
+    xlab='# of states [nstates]', ylab='BIC',
+    main=ifelse(is.multi,'BIC vs. nstates - Multivariate','BIC vs. nstates - Univariate'),
     panel.first= grid(NULL,NULL,lwd=1, col='gray') 
   )
   layout(1)
   plot( #### LL PLOT
-    min.s:max.s, ll, type='l', col='#000075',
-    xlab='# of states [nstates]', ylab='Log-likelihood', main='Log-likelihood vs. nstates',
+    min.s:max.s, ll, type='l', col='#000075', lwd=3,
+    xlab='# of states [nstates]', ylab='Log-likelihood', 
+    main=ifelse(is.multi,'Log-likelihood vs. nstates - Multivariate','Lol-likelihood vs. nstates - Univariate'),
     panel.first=grid(NULL,NULL,lwd=1,col='gray')
   )
-  return(data.frame(BIC=bic, LL=ll))
+  return(data.frame(BIC=bic, LL=ll, N=min.s:max.s))
 }
 
 
-## get plot of BIC and logLike vs nstates
-ns.df <- plot.bic.state(train.data,2,20)
 
-## Calculate window sizes for each data set
-# win.size <- 180
-# train.win <- nrow(train.data)/win.size
-# t1.w <- nrow(test1)/win.size
-# t2.w <- nrow(test2)/win.size
-# t3.w <- nrow(test3)/win.size
-# t4.w <- nrow(test4)/win.size
-# t5.w <- nrow(test5)/win.size
+
+## get plot of BIC and logLike vs nstates for univariate HMM
+ns.df       <- plot.bic.state(train.data, 2, 30, is.multi=FALSE)
+## get plot of BIC and logLike vs nstates for multivariate HMM
+ns.df.multi <- plot.bic.state(train.data, 2, 30, is.multi=TRUE)
+
+### NEED TO SET THIS ACCORDING TO plots obtained 
+### from the above 2 calls to plot.bic.state() 
+op.states <- 10
 
 ## Train model using the optimal nstate value
-train.mod <- depmix(
-              response= Global_active_power~1, data=train.data,
-              family=gaussian("identity"), ntimes=rep(win.size,train.win),
-              nstates=
-             )
-fit.train.m <- fit(train.mod)
+trained.mod       <- train.model(train.data, n=op.states)
+## Train multivariate using the optimal nstate value
+trained.multi.mod <- train.multi.model(train.data, n=op.states)
 
+## test all 5 test data sets for univariate
+t1.ll <- test.model(trained.mod, test1, op.states)
+t2.ll <- test.model(trained.mod, test2, op.states)
+t3.ll <- test.model(trained.mod, test3, op.states)
+t4.ll <- test.model(trained.mod, test4, op.states)
+t5.ll <- test.model(trained.mod, test5, op.states)
 
-#### function to find log-likelihood for test data set using a trained model
-test.model <- function(trained, test.data, nstates) {
-  win.df <- data.frame()
-  ll.df <- data.frame()
-  count <- 0
-  
-  ll <- c()
-  ll.c <- 1
-  
-  for (i in 1:nrow(test.data)) {
-    if(count < 180) {
-      win.df <- rbind(win.df, test.data[i,])
-      count <- count + 1
-    } else {
-      m <- depmix(
-            response=Global_active_power~1, data=win.df,
-            family=gaussian('identity'), nstates=nstates,
-            ntimes= rep(count,1)
-           )
-      m <- setpars(m, getpars(trained))
-      fb <- forwardbackward(m)
-      tw.size <- nrow(test.data)/180
-      
-      n <- fb$logLike/tw.size
-      
-      ll[ll.c] <- n
-      ll.c <- ll.c+1
-      
-      win.df <- data.frame()
-      ll.df <- data.frame()
-      count <- 0
-    }
-  }
-  return(ll)
-}
-
-## function to plot ll vals of each week of test data set against trained model
-plot.test.model <- function(trained, test.data, nstates, test.set) {
-  hmm.result <- test.model(trained, test.data, nstates)
-  length(hmm.result)
-  
-  size_of_window <- 180
-  windows <- nrow(test.data)/size_of_window - 1
-  weeks <- c(1:windows)
-  
-  hmm.df <- data.frame(Week=weeks, Loglike=hmm.result)
-  plot(
-    hmm.df, pch=24, ylab='Log-likelihood', 
-    main=paste('Log-likelihood for every week in Test set #', test.set, sep=''),
-    panel.first=grid(NULL,NULL,lwd=1,col='gray'), lwd=2, col='red'
-  )
-  return(hmm.df)
-}
-
-ll.t1 <- plot.test.model(fit.train.m, test1, 15, '1')
-ll.t2 <- plot.test.model(fit.train.m, test2, 15, '2')
-ll.t3 <- plot.test.model(fit.train.m, test3, 15, '3')
-ll.t4 <- plot.test.model(fit.train.m, test4, 15, '4')
-ll.t5 <- plot.test.model(fit.train.m, test5, 15, '5')
-
+## test all 5 test data sets for multivariate
+t1.m.ll <- test.multi.model(trained.multi.mod, test1, op.states)
+t2.m.ll <- test.multi.model(trained.multi.mod, test2, op.states)
+t3.m.ll <- test.multi.model(trained.multi.mod, test3, op.states)
+t4.m.ll <- test.multi.model(trained.multi.mod, test4, op.states)
+t5.m.ll <- test.multi.model(trained.multi.mod, test5, op.states)
