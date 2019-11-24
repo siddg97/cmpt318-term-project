@@ -212,9 +212,11 @@ c2 <- function(data) {
 }
 
 ## Import data
-data <- init(3,16,18)               # init(day_number, start_time, end_time)
+data <- init(3,16,21)               # init(day_number, start_time, end_time)
+
 ## perform c1 tasks
 c1.result <- c1(data)
+
 ## perform c2 tasks
 c2.result <- c2(data)
 

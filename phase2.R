@@ -129,6 +129,8 @@ month.maxs <- aggregate(
                   by= list(Month = month(as.Date(train.data$Date, format='%d/%m/%Y'))), 
                   FUN = max
               )
+
+
 month.name <- function(n) {
   ifelse(n==1,'January',
     ifelse(n==2, 'Feburary', 
@@ -509,4 +511,130 @@ for (i in 1:12) {
 
 
 set.seed(1)
+###############################
+######### DATA VARS:###########
+###############################
+## +> train.data <- data
+## +> test1 <- init.t1(3,16,18)
+## +> test2 <- init.t2(3,16,18)
+## +> test3 <- init.t3(3,16,18)
+## +> test4 <- init.t4(3,16,18)
+## +> test5 <- init.t5(3,16,18)
+
+
+## Find optimal nstates and plot
+plot.bic.state <- function(model.data, min.s, max.s) {
+  bic <- c()
+  ll <- c()
+  index <- 1
+  model <- NULL
+  
+  for (i in min.s:max.s) {
+    model <- depmix(
+                response=Global_active_power~1, data=model.data,
+                family=gaussian("identity"), nstates=i
+             )
+    fit.model <- fit(model)
+    bic[index] <- BIC(fit.model)
+    ll[index] <- logLik(fit.model)
+    index <- index+1
+  }
+  ## Now, bic and ll have values indexed by number of states.
+  ## We plot them to analyse the optimal nstates for our training model
+  layout(1)
+  plot( #### BIC PLOT
+    min.s:max.s, bic, type='l', col='#911EB4',
+    xlab='# of states [nstates]', ylab='BIC', main='BIC vs. nstates',
+    panel.first= grid(NULL,NULL,lwd=1, col='gray') 
+  )
+  layout(1)
+  plot( #### LL PLOT
+    min.s:max.s, ll, type='l', col='#000075',
+    xlab='# of states [nstates]', ylab='Log-likelihood', main='Log-likelihood vs. nstates',
+    panel.first=grid(NULL,NULL,lwd=1,col='gray')
+  )
+  return(data.frame(BIC=bic, LL=ll))
+}
+
+
+## get plot of BIC and logLike vs nstates
+ns.df <- plot.bic.state(train.data,2,20)
+
+## Calculate window sizes for each data set
+# win.size <- 180
+# train.win <- nrow(train.data)/win.size
+# t1.w <- nrow(test1)/win.size
+# t2.w <- nrow(test2)/win.size
+# t3.w <- nrow(test3)/win.size
+# t4.w <- nrow(test4)/win.size
+# t5.w <- nrow(test5)/win.size
+
+## Train model using the optimal nstate value
+train.mod <- depmix(
+              response= Global_active_power~1, data=train.data,
+              family=gaussian("identity"), ntimes=rep(win.size,train.win),
+              nstates=
+             )
+fit.train.m <- fit(train.mod)
+
+
+#### function to find log-likelihood for test data set using a trained model
+test.model <- function(trained, test.data, nstates) {
+  win.df <- data.frame()
+  ll.df <- data.frame()
+  count <- 0
+  
+  ll <- c()
+  ll.c <- 1
+  
+  for (i in 1:nrow(test.data)) {
+    if(count < 180) {
+      win.df <- rbind(win.df, test.data[i,])
+      count <- count + 1
+    } else {
+      m <- depmix(
+            response=Global_active_power~1, data=win.df,
+            family=gaussian('identity'), nstates=nstates,
+            ntimes= rep(count,1)
+           )
+      m <- setpars(m, getpars(trained))
+      fb <- forwardbackward(m)
+      tw.size <- nrow(test.data)/180
+      
+      n <- fb$logLike/tw.size
+      
+      ll[ll.c] <- n
+      ll.c <- ll.c+1
+      
+      win.df <- data.frame()
+      ll.df <- data.frame()
+      count <- 0
+    }
+  }
+  return(ll)
+}
+
+## function to plot ll vals of each week of test data set against trained model
+plot.test.model <- function(trained, test.data, nstates, test.set) {
+  hmm.result <- test.model(trained, test.data, nstates)
+  length(hmm.result)
+  
+  size_of_window <- 180
+  windows <- nrow(test.data)/size_of_window - 1
+  weeks <- c(1:windows)
+  
+  hmm.df <- data.frame(Week=weeks, Loglike=hmm.result)
+  plot(
+    hmm.df, pch=24, ylab='Log-likelihood', 
+    main=paste('Log-likelihood for every week in Test set #', test.set, sep=''),
+    panel.first=grid(NULL,NULL,lwd=1,col='gray'), lwd=2, col='red'
+  )
+  return(hmm.df)
+}
+
+ll.t1 <- plot.test.model(fit.train.m, test1, 15, '1')
+ll.t2 <- plot.test.model(fit.train.m, test2, 15, '2')
+ll.t3 <- plot.test.model(fit.train.m, test3, 15, '3')
+ll.t4 <- plot.test.model(fit.train.m, test4, 15, '4')
+ll.t5 <- plot.test.model(fit.train.m, test5, 15, '5')
 
