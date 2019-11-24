@@ -531,7 +531,7 @@ train.model <- function(model.data,n){
   # set count column name
   colnames(num.entries) <- c('Year','Day','Count')
   # extract the count column
-  num.entries <- num.entries[,3]
+  num.entries <- num.entries$Count
   
   set.seed(1)
   model = depmix(
@@ -539,7 +539,7 @@ train.model <- function(model.data,n){
             nstates=n, family=gaussian("identity"), ntimes=num.entries
           )
   fit.m = fit(model)
-  return(fit.m)
+  return(data.frame(Model=fit.m, Ntimes=num.entries))
 }
 
 # Train the intial multivariate model and fit it
@@ -553,7 +553,7 @@ train.multi.model <- function(model.data,n) {
   # set count column name
   colnames(num.entries) <- c('Year','Day','Count')
   # extract the count column
-  num.entries <- num.entries[,3]
+  num.entries <- num.entries$Count
   
   set.seed(1)
   model = depmix(
@@ -562,7 +562,7 @@ train.multi.model <- function(model.data,n) {
     family=list(gaussian("identity"), gaussian("identity"))
   )
   fit.m = fit(model)
-  return(fit.m)
+  return(data.frame(Model=fit.m, Ntimes=num.entries))
 }
 
 
@@ -581,7 +581,7 @@ test.model <- function(trained.model, test.data, n) {
   # set count column name
   colnames(num.entries) <- c("Year","Day","Count")
   # extract the count column
-  num.entries <- num.entries[,3]
+  num.entries <- num.entries$Count
   
   set.seed(1)
   model <- depmix(
@@ -591,7 +591,7 @@ test.model <- function(trained.model, test.data, n) {
   model <- setpars(model, getpars(trained.model))
   fb <- forwardbackward(model)
   
-  return(fb$logLike)
+  return(data.frame(Loglike=fb$logLike, Ntimes=num.entries))
 }
 
 # Test the trained multivariate model for the given test data set
@@ -609,7 +609,7 @@ test.multi.model <- function(trained.model, test.data, n) {
   # set count column name
   colnames(num.entries) <- c("Year","Day","Count")
   # extract the count column
-  num.entries <- num.entries[,3]
+  num.entries <- num.entries$Count
   
   set.seed(1)
   model <- depmix(
@@ -620,7 +620,7 @@ test.multi.model <- function(trained.model, test.data, n) {
   model <- setpars(model, getpars(trained.model))
   fb <- forwardbackward(model)
   
-  return(fb$logLike)
+  return(data.frame(Loglike=fb$logLike, Ntimes=num.entries))
 }
 
 
@@ -637,8 +637,8 @@ plot.bic.state <- function(model.data, min.s, max.s, is.multi) {
     } else {
       model <- train.multi.model(model.data, i)
     }
-    bic[index] <- BIC(model)
-    ll[index] <- logLik(model)
+    bic[index] <- BIC(model$Model)                      # Record BIC value
+    ll[index] <- logLik(model$Model)/mean(model$Ntimes) # Record normalized Log-likelihood for each wednesday time interval
     index <- index+1
   }
   ## Now, bic and ll have values indexed by number of states.
